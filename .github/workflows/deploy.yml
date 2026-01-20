@@ -1,0 +1,51 @@
+name: Docusaurus部署到 GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+    # 如果你想进一步定义触发器、路径等，可以查看 GitHub Actions 文档
+    # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#on
+  workflow_dispatch:  # 添加这一行即可手动触发  
+
+jobs:
+  build:
+    name: 1️⃣构建 Docusaurus
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: 安装依赖
+        run: npm ci
+      - name: 构建网站
+        run: npm run build
+
+      - name: 上传构建产物
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build
+
+  deploy:
+    name: 2️⃣部署到 GitHub Pages
+    needs: build
+
+    # 授予 GITHUB_TOKEN 部署到 Pages 所需的权限
+    permissions:
+      pages: write # 用于部署到 Pages
+      id-token: write # 用于验证部署来源的合法性
+
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }} # 部署后的 URL...
+    runs-on: ubuntu-latest
+    steps:
+      - name: 部署到 GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
