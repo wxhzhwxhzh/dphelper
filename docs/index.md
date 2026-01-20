@@ -21,5 +21,5 @@ title: '首页'
 
 # 获取插件
 
-![alt](/img/scan.png)
+![alt](/img/scan8.png)
 
